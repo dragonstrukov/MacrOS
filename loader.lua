@@ -10,4 +10,6 @@ elseif game.PlaceId == 5178049460 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Build-A-Boat-For-Treasure/Project-Zeg/script.lua"))()
 elseif game.PlaceId == 142823291 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Murder-Mystery-2/script.lua"))()
+elseif game.PlaceId == 7009987220 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Ragdoll-Stack/script.lua"))()
 end

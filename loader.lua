@@ -12,6 +12,8 @@ elseif game.PlaceId == 142823291 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Murder-Mystery-2/script.lua"))()
 elseif game.PlaceId == 7009987220 then
     loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Ragdoll-Stack/script.lua"))()
+elseif game.PlaceId == 72659788689464 then
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Life-in-Prison/script.lua"))()
 else
     loadstring(game:HttpGet("https://raw.githubusercontent.com/dragonstrukov/MacrOS/refs/heads/main/Untitled/script.lua"))()
 end

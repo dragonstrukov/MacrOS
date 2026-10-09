@@ -1,0 +1,35 @@
+name: _fetch_sources
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Branch to push fetched files to"
+        required: false
+        default: "arena/fetch-sources"
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Drive files
+        run: |
+          set -euo pipefail
+          mkdir -p _raw
+          curl -sL "https://drive.usercontent.google.com/download?id=1H2CbXQ1_HdAGDp3XVmaImFVT4COiJ021&export=download&confirm=t" -o _raw/ui.txt
+          curl -sL "https://drive.usercontent.google.com/download?id=1dmq8UCkH6TlkS1r1-npvVqRDYv-YAulz&export=download&confirm=t" -o _raw/script.txt
+          wc -c _raw/ui.txt _raw/script.txt
+          head -c 200 _raw/ui.txt; echo; echo "-----"; head -c 200 _raw/script.txt
+
+      - name: Commit
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f _raw
+          git commit -m "chore: fetch raw sources"
+          git push origin "HEAD:${{ inputs.target }}"

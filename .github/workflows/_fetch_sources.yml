@@ -15,19 +15,27 @@ jobs:
     steps:
       - name: Fetch Drive files
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p _raw
-          curl -sL "https://drive.usercontent.google.com/download?id=1H2CbXQ1_HdAGDp3XVmaImFVT4COiJ021&export=download&confirm=t" -o _raw/ui.txt
-          curl -sL "https://drive.usercontent.google.com/download?id=1dmq8UCkH6TlkS1r1-npvVqRDYv-YAulz&export=download&confirm=t" -o _raw/script.txt
-          wc -c _raw/ui.txt _raw/script.txt
-          echo "--- ui head ---"; head -c 120 _raw/ui.txt; echo
-          echo "--- script head ---"; head -c 120 _raw/script.txt; echo
+          {
+            echo "date: $(date -u)"
+            for pair in "ui.txt:1H2CbXQ1_HdAGDp3XVmaImFVT4COiJ021" "script.txt:1dmq8UCkH6TlkS1r1-npvVqRDYv-YAulz"; do
+              name="${pair%%:*}"; id="${pair##*:}"
+              echo "== $name =="
+              curl -sL --retry 3 --max-time 180 \
+                "https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t" \
+                -o "_raw/$name"
+              echo "exit=$? bytes=$(wc -c < "_raw/$name" 2>/dev/null || echo 0)"
+              head -c 100 "_raw/$name"; echo
+            done
+          } 2>&1 | tee _raw/STATUS.txt
 
       - name: Commit
         run: |
-          set -euo pipefail
+          set -uo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f _raw
-          git commit -m "chore: fetch raw sources"
-          git push origin HEAD:arena/fetch-sources
+          git commit -m "chore: fetch raw sources" || true
+          git push origin HEAD:arena/fetch-sources || true
+          exit 0

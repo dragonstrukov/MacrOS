@@ -13,6 +13,10 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Fetch Drive files
         run: |
           set -uo pipefail
@@ -20,22 +24,24 @@ jobs:
           {
             echo "date: $(date -u)"
             for pair in "ui.txt:1H2CbXQ1_HdAGDp3XVmaImFVT4COiJ021" "script.txt:1dmq8UCkH6TlkS1r1-npvVqRDYv-YAulz"; do
-              name="${pair%%:*}"; id="${pair##*:}"
+              name="${pair%%:*}"; fid="${pair##*:}"
               echo "== $name =="
               curl -sL --retry 3 --max-time 180 \
-                "https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t" \
+                "https://drive.usercontent.google.com/download?id=${fid}&export=download&confirm=t" \
                 -o "_raw/$name"
-              echo "exit=$? bytes=$(wc -c < "_raw/$name" 2>/dev/null || echo 0)"
+              echo "curl_exit=$? bytes=$(wc -c < "_raw/$name" 2>/dev/null || echo 0)"
               head -c 100 "_raw/$name"; echo
             done
-          } 2>&1 | tee _raw/STATUS.txt
+          } > _raw/STATUS.txt 2>&1
+          cat _raw/STATUS.txt
 
       - name: Commit
+        if: always()
         run: |
           set -uo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -f _raw
-          git commit -m "chore: fetch raw sources" || true
-          git push origin HEAD:arena/fetch-sources || true
+          git commit -m "chore: fetch raw sources" || echo "commit skipped"
+          git push origin HEAD:arena/fetch-sources || echo "push failed"
           exit 0
